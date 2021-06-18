@@ -19,7 +19,7 @@ public class Team {
 	private long totalWins;
 
 	@Transient
-	List<Match> matches;
+	private List<Match> matches;
 
 	public Long getId() {
 		return id;

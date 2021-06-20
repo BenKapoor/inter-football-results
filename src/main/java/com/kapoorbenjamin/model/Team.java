@@ -17,6 +17,7 @@ public class Team {
 	private String teamName;
 	private long totalMatches;
 	private long totalWins;
+	private long totalDraw;
 
 	@Transient
 	private List<Match> matches;
@@ -53,6 +54,14 @@ public class Team {
 		this.totalWins = totalWins;
 	}
 
+	public long getTotalDraw() {
+		return totalDraw;
+	}
+
+	public void setTotalDraw(long totalDraw) {
+		this.totalDraw = totalDraw;
+	}
+
 	public Team(String teamName, long totalMatches) {
 		super();
 		this.teamName = teamName;
@@ -70,7 +79,7 @@ public class Team {
 	@Override
 	public String toString() {
 		return "Team [id=" + id + ", teamName=" + teamName + ", totalMatches=" + totalMatches + ", totalWins="
-				+ totalWins + "]";
+				+ totalWins + ", totalDraw=" + totalDraw + "]";
 	}
 
 	public Team() {

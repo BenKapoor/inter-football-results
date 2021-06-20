@@ -50,32 +50,48 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 			Map<String, Team> teamData = new HashMap<>();
 
 			// on type pour éviter les erreurs
-			 em.createQuery("select m.homeTeam, count(*) from Match m group by m.homeTeam", Object[].class) 
-			  .getResultList()
-			  .stream()
-			  .map(e -> new Team((String) e[0], (long) e[1])) // recupération du nom de la team (cast string) et du nombre (long)
-			  .forEach(team -> teamData.put(team.getTeamName(), team));
+			em.createQuery("select m.homeTeam, count(*) from Match m group by m.homeTeam", Object[].class)
+					.getResultList().stream().map(e -> new Team((String) e[0], (long) e[1])) // recupération du nom de
+																								// la team (cast string)
+																								// et du nombre (long)
+					.forEach(team -> teamData.put(team.getTeamName(), team));
 
-			 em.createQuery("select m.awayTeam, count(*) from Match m group by m.awayTeam", Object[].class)
-			   .getResultList()
-			   .stream()
-			   .forEach(e -> {
-				   Team team = teamData.get((String) e[0]);
-				   if(team != null) team.setTotalMatches(team.getTotalMatches() + (long) e[1]); // rajoute le resultat du nb de matchs des equipes ext aux à dom
-			   });
+			em.createQuery("select m.awayTeam, count(*) from Match m group by m.awayTeam", Object[].class)
+					.getResultList().stream().forEach(e -> {
+						Team team = teamData.get(e[0]);
+						if (team != null) {
+							team.setTotalMatches(team.getTotalMatches() + (long) e[1]); // rajoute le resultat du nb de
+																						// matchs des equipes ext aux à
+																						// dom
+						}
+					});
 
+			em.createQuery("select m.teamWinner, count(*) from Match m group by teamWinner", Object[].class)
+					.getResultList().stream().forEach(e -> {
+						Team team = teamData.get(e[0]);
+						if (team != null) {
+							team.setTotalWins((long) e[1]);
+						}
+					});
 
-			 em.createQuery("select m.teamWinner, count(*) from Match m group by teamWinner", Object[].class)
-			   .getResultList()
-			   .stream()
-			   .forEach(e -> {
-				   Team team = teamData.get((String) e[0]);
-				   if(team != null) team.setTotalWins( (long) e[1]);
-			   });
-			 
-			 
-			 teamData.values().forEach(team -> em.persist(team));
-//			 teamData.values().forEach(team -> System.out.println(team));
+			em.createQuery("select m.homeTeam, count(*) from Match m where m.homeScore=m.awayScore group by homeTeam",
+					Object[].class).getResultList().stream().forEach(e -> {
+						Team team = teamData.get(e[0]);
+						if (team != null) {
+							team.setTotalDraw((long) e[1]);
+						}
+					});
+
+			em.createQuery("select m.awayTeam, count(*) from Match m where m.homeScore=m.awayScore group by awayTeam",
+					Object[].class).getResultList().stream().forEach(e -> {
+						Team team = teamData.get(e[0]);
+						if (team != null) {
+							team.setTotalDraw(team.getTotalDraw() + (long) e[1]);
+						}
+					});
+
+			teamData.values().forEach(team -> em.persist(team));
+			teamData.values().forEach(team -> System.out.println(team));
 		}
 	}
 }
